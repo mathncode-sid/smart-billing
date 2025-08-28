@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Utility Billing Assistant - Bill Splitting</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Smart Billing</a>
+                
+                <nav class="nav" role="navigation" aria-label="Main navigation">
+                    <a href="index.html" class="nav-link">Dashboard</a>
+                    <a href="pay.html" class="nav-link">Pay</a>
+                    <a href="split.html" class="nav-link">Split</a>
+                    <a href="history.html" class="nav-link">History</a>
+                    <a href="settings.html" class="nav-link">Settings</a>
+                    <a href="ussd.html" class="nav-link">USSD Simulator</a>
+                </nav>
+                
+                <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <section aria-labelledby="split-title">
+                <h1 id="split-title" class="mb-6">Bill Splitting</h1>
+                
+                <div class="grid grid-2 mb-6">
+                    <!-- Create New Split Form -->
+                    <div class="card">
+                        <h2 class="card-title mb-4">Create New Split</h2>
+                        
+                        <form id="split-form" novalidate>
+                            <div class="form-group">
+                                <label for="split-utility" class="form-label">Select Utility *</label>
+                                <select id="split-utility" class="form-select" required aria-describedby="split-utility-help">
+                                    <option value="">Choose utility to split</option>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                                <small id="split-utility-help" class="text-secondary">Select the utility bill you want to split</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="total-amount" class="form-label">Total Amount (KES) *</label>
+                                <input 
+                                    type="number" 
+                                    id="total-amount" 
+                                    class="form-input" 
+                                    placeholder="Enter total bill amount"
+                                    min="1"
+                                    step="0.01"
+                                    required
+                                    aria-describedby="total-amount-help"
+                                >
+                                <small id="total-amount-help" class="text-secondary">Enter the total amount to be split</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="participants" class="form-label">Participants *</label>
+                                <textarea 
+                                    id="participants" 
+                                    class="form-textarea" 
+                                    placeholder="Enter participant names separated by commas (e.g., John, Mary, Peter)"
+                                    required
+                                    aria-describedby="participants-help"
+                                    rows="3"
+                                ></textarea>
+                                <small id="participants-help" class="text-secondary">Enter names separated by commas. Include yourself if you're participating.</small>
+                            </div>
+
+                            <fieldset class="form-group">
+                                <legend class="form-label">Share Type *</legend>
+                                <div class="radio-group" role="radiogroup" aria-required="true">
+                                    <div class="radio-item">
+                                        <input type="radio" id="equal-share" name="share-type" value="equal" checked required>
+                                        <label for="equal-share">Equal Split</label>
+                                    </div>
+                                    <div class="radio-item">
+                                        <input type="radio" id="custom-share" name="share-type" value="custom" required>
+                                        <label for="custom-share">Custom Split</label>
+                                    </div>
+                                </div>
+                                <small class="text-secondary">Equal split divides the amount evenly among all participants</small>
+                            </fieldset>
+
+                            <button type="submit" class="btn btn-primary">
+                                Create Split
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Split Calculator -->
+                    <div>
+                        <div class="card mb-4">
+                            <h3 class="card-title">Split Calculator</h3>
+                            <div id="split-calculator">
+                                <p class="text-secondary">Fill in the form to see split calculations</p>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">Splitting Tips</h3>
+                            <ul class="text-secondary" style="padding-left: 1.5rem; line-height: 1.8;">
+                                <li>Include all participants who will contribute to the bill</li>
+                                <li>Equal splits are automatically calculated for fairness</li>
+                                <li>You can mark payments as completed when participants pay</li>
+                                <li>Track progress with visual progress bars</li>
+                                <li>Export split details for record keeping</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Splits Section -->
+                <section aria-labelledby="active-splits-title">
+                    <h2 id="active-splits-title" class="mb-4">Active Splits</h2>
+                    <div id="active-splits">
+                        <!-- Active splits will be populated by JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Split History Summary -->
+                <section aria-labelledby="split-summary-title" class="mt-6">
+                    <h2 id="split-summary-title" class="mb-4">Split Summary</h2>
+                    <div class="grid grid-3">
+                        <div class="card text-center">
+                            <h3 class="card-title">Total Splits</h3>
+                            <p class="text-2xl font-bold text-primary" id="total-splits">0</p>
+                        </div>
+                        
+                        <div class="card text-center">
+                            <h3 class="card-title">Completed Splits</h3>
+                            <p class="text-2xl font-bold text-success" id="completed-splits">0</p>
+                        </div>
+                        
+                        <div class="card text-center">
+                            <h3 class="card-title">Pending Payments</h3>
+                            <p class="text-2xl font-bold text-warning" id="pending-payments">0</p>
+                        </div>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        // Split page specific functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            setupSplitCalculator();
+            updateSplitSummary();
+        });
+
+        function setupSplitCalculator() {
+            const utilitySelect = document.getElementById('split-utility');
+            const totalAmountInput = document.getElementById('total-amount');
+            const participantsInput = document.getElementById('participants');
+            const shareTypeInputs = document.querySelectorAll('input[name="share-type"]');
+            const calculator = document.getElementById('split-calculator');
+
+            function updateCalculator() {
+                const utility = utilitySelect.value;
+                const totalAmount = parseFloat(totalAmountInput.value) || 0;
+                const participantsText = participantsInput.value.trim();
+                const shareType = document.querySelector('input[name="share-type"]:checked')?.value;
+
+                if (!utility || !totalAmount || !participantsText) {
+                    calculator.innerHTML = '<p class="text-secondary">Fill in the form to see split calculations</p>';
+                    return;
+                }
+
+                const participants = participantsText.split(',').map(name => name.trim()).filter(name => name);
+                
+                if (participants.length < 2) {
+                    calculator.innerHTML = '<p class="text-warning">Please enter at least 2 participants</p>';
+                    return;
+                }
+
+                const shareAmount = totalAmount / participants.length;
+
+                calculator.innerHTML = `
+                    <div class="mb-4">
+                        <h4 class="font-semibold">${utility}</h4>
+                        <p class="text-secondary">Total: KES ${totalAmount.toLocaleString()}</p>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span>Number of Participants:</span>
+                            <span class="font-semibold">${participants.length}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Share per Person:</span>
+                            <span class="font-semibold text-primary">KES ${shareAmount.toLocaleString()}</span>
+                        </div>
+                        <div class="mt-3">
+                            <h5 class="font-semibold mb-2">Participants:</h5>
+                            <div class="space-y-1">
+                                ${participants.map(name => `
+                                    <div class="flex justify-between text-sm">
+                                        <span>${name}</span>
+                                        <span>KES ${shareAmount.toLocaleString()}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            utilitySelect.addEventListener('change', updateCalculator);
+            totalAmountInput.addEventListener('input', updateCalculator);
+            participantsInput.addEventListener('input', updateCalculator);
+            shareTypeInputs.forEach(input => input.addEventListener('change', updateCalculator));
+        }
+
+        function updateSplitSummary() {
+            if (!window.app || !window.app.data) return;
+
+            const splits = window.app.data.splits;
+            const totalSplits = splits.length;
+            
+            const completedSplits = splits.filter(split => 
+                split.participants.every(participant => participant.paid)
+            ).length;
+            
+            const pendingPayments = splits.reduce((total, split) => 
+                total + split.participants.filter(participant => !participant.paid).length, 0
+            );
+
+            document.getElementById('total-splits').textContent = totalSplits;
+            document.getElementById('completed-splits').textContent = completedSplits;
+            document.getElementById('pending-payments').textContent = pendingPayments;
+        }
+
+        // Function to handle split creation success
+        function onSplitCreated() {
+            updateSplitSummary();
+        }
+
+        // Override the app's createSplit method to include our callback
+        if (window.app) {
+            const originalCreateSplit = window.app.createSplit.bind(window.app);
+            window.app.createSplit = function() {
+                originalCreateSplit();
+                onSplitCreated();
+            };
+        }
+    </script>
+</body>
+</html>

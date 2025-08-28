@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Utility Billing Assistant - Settings</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Smart Billing</a>
+                
+                <nav class="nav" role="navigation" aria-label="Main navigation">
+                    <a href="index.html" class="nav-link">Dashboard</a>
+                    <a href="pay.html" class="nav-link">Pay</a>
+                    <a href="split.html" class="nav-link">Split</a>
+                    <a href="history.html" class="nav-link">History</a>
+                    <a href="settings.html" class="nav-link">Settings</a>
+                    <a href="ussd.html" class="nav-link">USSD Simulator</a>
+                </nav>
+                
+                <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <section aria-labelledby="settings-title">
+                <h1 id="settings-title" class="mb-6">Settings & Management</h1>
+                
+                <!-- Utility Management Section -->
+                <section aria-labelledby="utility-management-title" class="mb-6">
+                    <h2 id="utility-management-title" class="mb-4">Utility Management</h2>
+                    <div id="utility-management">
+                        <!-- Utility management content will be populated by JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Add New Utility Form -->
+                <section aria-labelledby="add-utility-title" class="mb-6">
+                    <div class="card">
+                        <h3 id="add-utility-title" class="card-title mb-4">Add New Utility</h3>
+                        
+                        <form id="add-utility-form" class="grid grid-2">
+                            <div class="form-group">
+                                <label for="utility-name" class="form-label">Utility Name *</label>
+                                <input 
+                                    type="text" 
+                                    id="utility-name" 
+                                    class="form-input" 
+                                    placeholder="e.g., Internet, Gas, Insurance"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="utility-provider" class="form-label">Provider *</label>
+                                <input 
+                                    type="text" 
+                                    id="utility-provider" 
+                                    class="form-input" 
+                                    placeholder="e.g., Safaricom, Kenya Power"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="utility-account" class="form-label">Account Number *</label>
+                                <input 
+                                    type="text" 
+                                    id="utility-account" 
+                                    class="form-input" 
+                                    placeholder="Your account number"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="utility-monthly" class="form-label">Monthly Amount (KES) *</label>
+                                <input 
+                                    type="number" 
+                                    id="utility-monthly" 
+                                    class="form-input" 
+                                    placeholder="0"
+                                    min="1"
+                                    step="0.01"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="utility-balance" class="form-label">Current Balance (KES) *</label>
+                                <input 
+                                    type="number" 
+                                    id="utility-balance" 
+                                    class="form-input" 
+                                    placeholder="0"
+                                    min="0"
+                                    step="0.01"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="utility-due-date" class="form-label">Due Date *</label>
+                                <input 
+                                    type="date" 
+                                    id="utility-due-date" 
+                                    class="form-input" 
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group flex items-end">
+                                <button type="submit" class="btn btn-primary">Add Utility</button>
+                            </div>
+
+                            <div class="form-group flex items-end">
+                                <button type="button" id="cancel-add" class="btn btn-secondary">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Reminder Settings Section -->
+                <section aria-labelledby="reminder-settings-title" class="mb-6">
+                    <h2 id="reminder-settings-title" class="mb-4">Reminder Settings</h2>
+                    <div id="reminder-settings">
+                        <!-- Reminder settings will be populated by JavaScript -->
+                    </div>
+                </section>
+
+                <!-- App Preferences Section -->
+                <section aria-labelledby="app-preferences-title" class="mb-6">
+                    <h2 id="app-preferences-title" class="mb-4">App Preferences</h2>
+                    <div class="card">
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Theme</label>
+                                <div class="radio-group">
+                                    <div class="radio-item">
+                                        <input type="radio" id="theme-light" name="theme" value="light">
+                                        <label for="theme-light">Light Mode</label>
+                                    </div>
+                                    <div class="radio-item">
+                                        <input type="radio" id="theme-dark" name="theme" value="dark">
+                                        <label for="theme-dark">Dark Mode</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="currency" class="form-label">Currency</label>
+                                <select id="currency" class="form-select">
+                                    <option value="KES">Kenyan Shilling (KES)</option>
+                                    <option value="USD">US Dollar (USD)</option>
+                                    <option value="EUR">Euro (EUR)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <input type="checkbox" id="notifications" checked> 
+                                    Enable Notifications
+                                </label>
+                                <small class="text-secondary">Receive browser notifications for due bills</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <input type="checkbox" id="auto-backup" checked> 
+                                    Auto Backup Data
+                                </label>
+                                <small class="text-secondary">Automatically backup your data locally</small>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Data Management Section -->
+                <section aria-labelledby="data-management-title" class="mb-6">
+                    <h2 id="data-management-title" class="mb-4">Data Management</h2>
+                    <div class="grid grid-3">
+                        <div class="card text-center">
+                            <h3 class="card-title">Export Data</h3>
+                            <p class="card-subtitle">Download all your data as JSON</p>
+                            <button id="export-data" class="btn btn-secondary">Export Data</button>
+                        </div>
+
+                        <div class="card text-center">
+                            <h3 class="card-title">Import Data</h3>
+                            <p class="card-subtitle">Restore data from backup file</p>
+                            <input type="file" id="import-file" accept=".json" style="display: none;">
+                            <button id="import-data" class="btn btn-secondary">Import Data</button>
+                        </div>
+
+                        <div class="card text-center">
+                            <h3 class="card-title">Reset Demo Data</h3>
+                            <p class="card-subtitle">Clear all data and restore defaults</p>
+                            <button id="reset-data" class="btn btn-warning">Reset Data</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- App Information Section -->
+                <section aria-labelledby="app-info-title">
+                    <h2 id="app-info-title" class="mb-4">App Information</h2>
+                    <div class="card">
+                        <div class="grid grid-2">
+                            <div>
+                                <h3 class="card-title">Smart Utility Billing Assistant</h3>
+                                <p class="text-secondary">Version 1.0.0</p>
+                                <p class="text-secondary">A demo application for managing utility bills, payments, and bill splitting.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-2">Features</h4>
+                                <ul class="text-secondary" style="padding-left: 1.5rem; line-height: 1.8;">
+                                    <li>Multi-utility bill management</li>
+                                    <li>Payment processing simulation</li>
+                                    <li>Bill splitting with friends</li>
+                                    <li>Payment history tracking</li>
+                                    <li>USSD simulator interface</li>
+                                    <li>Smart reminders system</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        // Settings page specific functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSettingsPage();
+            setupAddUtilityForm();
+            setupDataManagement();
+            setupAppPreferences();
+        });
+
+        function initializeSettingsPage() {
+            if (!window.app) return;
+            
+            // Set current theme in radio buttons
+            const currentTheme = window.app.data.settings?.theme || 'light';
+            document.getElementById(`theme-${currentTheme}`).checked = true;
+            
+            // Set other preferences
+            document.getElementById('currency').value = window.app.data.settings?.currency || 'KES';
+            document.getElementById('notifications').checked = window.app.data.settings?.notifications !== false;
+            document.getElementById('auto-backup').checked = window.app.data.settings?.autoBackup !== false;
+        }
+
+        function setupAddUtilityForm() {
+            const form = document.getElementById('add-utility-form');
+            const cancelBtn = document.getElementById('cancel-add');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                addNewUtility();
+            });
+
+            cancelBtn.addEventListener('click', function() {
+                form.reset();
+            });
+        }
+
+        function addNewUtility() {
+            const name = document.getElementById('utility-name').value.trim();
+            const provider = document.getElementById('utility-provider').value.trim();
+            const accountNumber = document.getElementById('utility-account').value.trim();
+            const monthlyAmount = parseFloat(document.getElementById('utility-monthly').value);
+            const balance = parseFloat(document.getElementById('utility-balance').value);
+            const dueDate = document.getElementById('utility-due-date').value;
+
+            if (!name || !provider || !accountNumber || !monthlyAmount || !balance || !dueDate) {
+                window.app.showMessage('Please fill in all required fields', 'error');
+                return;
+            }
+
+            const newUtility = {
+                id: name.toLowerCase().replace(/\s+/g, '-'),
+                name: name,
+                provider: provider,
+                balance: balance,
+                dueDate: dueDate,
+                monthlyAmount: monthlyAmount,
+                instalmentPaid: 0,
+                accountNumber: accountNumber
+            };
+
+            // Check if utility already exists
+            const existingUtility = window.app.data.utilities.find(u => u.id === newUtility.id);
+            if (existingUtility) {
+                window.app.showMessage('A utility with this name already exists', 'error');
+                return;
+            }
+
+            window.app.data.utilities.push(newUtility);
+            window.app.saveData();
+            window.app.showMessage(`${name} utility added successfully!`, 'success');
+            
+            // Reset form and refresh utility management
+            document.getElementById('add-utility-form').reset();
+            window.app.renderUtilityManagement();
+        }
+
+        function setupDataManagement() {
+            const exportBtn = document.getElementById('export-data');
+            const importBtn = document.getElementById('import-data');
+            const importFile = document.getElementById('import-file');
+            const resetBtn = document.getElementById('reset-data');
+
+            exportBtn.addEventListener('click', function() {
+                exportAppData();
+            });
+
+            importBtn.addEventListener('click', function() {
+                importFile.click();
+            });
+
+            importFile.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    importAppData(file);
+                }
+            });
+
+            resetBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to reset all data? This action cannot be undone.')) {
+                    window.app.resetData();
+                }
+            });
+        }
+
+        function setupAppPreferences() {
+            const themeInputs = document.querySelectorAll('input[name="theme"]');
+            const currencySelect = document.getElementById('currency');
+            const notificationsCheckbox = document.getElementById('notifications');
+            const autoBackupCheckbox = document.getElementById('auto-backup');
+
+            themeInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    if (this.checked) {
+                        window.app.data.settings.theme = this.value;
+                        window.app.saveData();
+                        window.app.setupTheme();
+                    }
+                });
+            });
+
+            currencySelect.addEventListener('change', function() {
+                window.app.data.settings.currency = this.value;
+                window.app.saveData();
+                window.app.showMessage(`Currency updated to ${this.value}`, 'success');
+            });
+
+            notificationsCheckbox.addEventListener('change', function() {
+                window.app.data.settings.notifications = this.checked;
+                window.app.saveData();
+                window.app.showMessage(`Notifications ${this.checked ? 'enabled' : 'disabled'}`, 'success');
+            });
+
+            autoBackupCheckbox.addEventListener('change', function() {
+                window.app.data.settings.autoBackup = this.checked;
+                window.app.saveData();
+                window.app.showMessage(`Auto backup ${this.checked ? 'enabled' : 'disabled'}`, 'success');
+            });
+        }
+
+        function exportAppData() {
+            const dataStr = JSON.stringify(window.app.data, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `smart-billing-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            window.app.showMessage('Data exported successfully!', 'success');
+        }
+
+        function importAppData(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    // Basic validation
+                    if (!importedData.utilities || !importedData.transactions) {
+                        throw new Error('Invalid data format');
+                    }
+                    
+                    window.app.data = importedData;
+                    window.app.saveData();
+                    window.app.showMessage('Data imported successfully! Refreshing page...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } catch (error) {
+                    window.app.showMessage('Error importing data: Invalid file format', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Utility management functions
+        window.editUtility = function(utilityId) {
+            window.app.showMessage('Edit functionality would open a modal or form', 'success');
+        };
+
+        window.removeUtility = function(utilityId) {
+            if (confirm('Are you sure you want to remove this utility?')) {
+                window.app.data.utilities = window.app.data.utilities.filter(u => u.id !== utilityId);
+                window.app.saveData();
+                window.app.renderUtilityManagement();
+                window.app.showMessage('Utility removed successfully!', 'success');
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Utility Billing Assistant - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Smart Billing</a>
+                
+                <nav class="nav" role="navigation" aria-label="Main navigation">
+                    <a href="index.html" class="nav-link">Dashboard</a>
+                    <a href="pay.html" class="nav-link">Pay</a>
+                    <a href="split.html" class="nav-link">Split</a>
+                    <a href="history.html" class="nav-link">History</a>
+                    <a href="settings.html" class="nav-link">Settings</a>
+                    <a href="ussd.html" class="nav-link">USSD Simulator</a>
+                </nav>
+                
+                <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <section aria-labelledby="dashboard-title">
+                <h1 id="dashboard-title" class="mb-6">Dashboard</h1>
+                
+                <!-- Utility Cards Section -->
+                <section aria-labelledby="utilities-title">
+                    <h2 id="utilities-title" class="mb-4">Your Utilities</h2>
+                    <div id="utility-cards" class="grid grid-4 mb-6">
+                        <!-- Utility cards will be populated by JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Smart Reminders Section -->
+                <section aria-labelledby="reminders-title">
+                    <h2 id="reminders-title" class="mb-4">Smart Reminders</h2>
+                    <div id="reminders" class="mb-6">
+                        <!-- Reminders will be populated by JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Quick Actions Section -->
+                <section aria-labelledby="quick-actions-title">
+                    <h2 id="quick-actions-title" class="mb-4">Quick Actions</h2>
+                    <div class="grid grid-3">
+                        <div class="card">
+                            <h3 class="card-title">Make Payment</h3>
+                            <p class="card-subtitle">Pay your utility bills quickly and securely</p>
+                            <a href="pay.html" class="btn btn-primary">Pay Now</a>
+                        </div>
+                        
+                        <div class="card">
+                            <h3 class="card-title">Split Bills</h3>
+                            <p class="card-subtitle">Share utility costs with roommates or family</p>
+                            <a href="split.html" class="btn btn-secondary">Create Split</a>
+                        </div>
+                        
+                        <div class="card">
+                            <h3 class="card-title">View History</h3>
+                            <p class="card-subtitle">Track your payment history and export records</p>
+                            <a href="history.html" class="btn btn-secondary">View History</a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Summary Statistics -->
+                <section aria-labelledby="summary-title" class="mt-6">
+                    <h2 id="summary-title" class="mb-4">Monthly Summary</h2>
+                    <div class="grid grid-4">
+                        <div class="card text-center">
+                            <h3 class="card-title">Total Outstanding</h3>
+                            <p class="text-2xl font-bold text-primary" id="total-outstanding">KES 0</p>
+                        </div>
+                        
+                        <div class="card text-center">
+                            <h3 class="card-title">Paid This Month</h3>
+                            <p class="text-2xl font-bold text-success" id="paid-this-month">KES 0</p>
+                        </div>
+                        
+                        <div class="card text-center">
+                            <h3 class="card-title">Upcoming Bills</h3>
+                            <p class="text-2xl font-bold text-warning" id="upcoming-bills">0</p>
+                        </div>
+                        
+                        <div class="card text-center">
+                            <h3 class="card-title">Active Splits</h3>
+                            <p class="text-2xl font-bold text-secondary" id="active-splits">0</p>
+                        </div>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        // Dashboard-specific functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update summary statistics
+            updateSummaryStats();
+        });
+
+        function updateSummaryStats() {
+            if (!window.app || !window.app.data) return;
+
+            const data = window.app.data;
+            
+            // Calculate total outstanding
+            const totalOutstanding = data.utilities.reduce((sum, utility) => sum + utility.balance, 0);
+            document.getElementById('total-outstanding').textContent = `KES ${totalOutstanding.toLocaleString()}`;
+            
+            // Calculate paid this month (from transactions)
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            const paidThisMonth = data.transactions
+                .filter(transaction => {
+                    const transactionDate = new Date(transaction.date);
+                    return transactionDate.getMonth() === currentMonth && 
+                           transactionDate.getFullYear() === currentYear;
+                })
+                .reduce((sum, transaction) => sum + transaction.amount, 0);
+            document.getElementById('paid-this-month').textContent = `KES ${paidThisMonth.toLocaleString()}`;
+            
+            // Count upcoming bills (due in next 7 days)
+            const today = new Date();
+            const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+            const upcomingCount = data.utilities.filter(utility => {
+                const dueDate = new Date(utility.dueDate);
+                return dueDate >= today && dueDate <= nextWeek;
+            }).length;
+            document.getElementById('upcoming-bills').textContent = upcomingCount;
+            
+            // Count active splits
+            const activeSplitsCount = data.splits.filter(split => 
+                split.participants.some(participant => !participant.paid)
+            ).length;
+            document.getElementById('active-splits').textContent = activeSplitsCount;
+        }
+    </script>
+</body>
+</html>

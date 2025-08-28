@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Utility Billing Assistant - USSD Simulator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Smart Billing</a>
+                
+                <nav class="nav" role="navigation" aria-label="Main navigation">
+                    <a href="index.html" class="nav-link">Dashboard</a>
+                    <a href="pay.html" class="nav-link">Pay</a>
+                    <a href="split.html" class="nav-link">Split</a>
+                    <a href="history.html" class="nav-link">History</a>
+                    <a href="settings.html" class="nav-link">Settings</a>
+                    <a href="ussd.html" class="nav-link">USSD Simulator</a>
+                </nav>
+                
+                <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <section aria-labelledby="ussd-title">
+                <h1 id="ussd-title" class="mb-6 text-center">USSD Simulator</h1>
+                
+                <div class="text-center mb-4">
+                    <p class="text-secondary">Experience the Smart Billing Assistant through a simulated USSD interface</p>
+                </div>
+
+                <!-- Phone Container -->
+                <div class="phone-container">
+                    <!-- Phone Screen -->
+                    <div class="phone-screen" role="application" aria-label="USSD Interface">
+                        <div id="ussd-screen">
+                            <!-- USSD content will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Phone Input -->
+                    <div style="margin-top: 1rem;">
+                        <div class="flex gap-2">
+                            <input 
+                                type="text" 
+                                id="ussd-input" 
+                                class="ussd-input" 
+                                placeholder="Enter choice..."
+                                maxlength="10"
+                                aria-label="USSD input"
+                            >
+                            <button id="ussd-send" class="btn btn-success btn-sm">Send</button>
+                        </div>
+                        <div class="flex gap-2 mt-2">
+                            <button id="ussd-back" class="btn btn-secondary btn-sm">Back</button>
+                            <button id="ussd-home" class="btn btn-secondary btn-sm">Home</button>
+                            <button id="ussd-exit" class="btn btn-warning btn-sm">Exit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- USSD Information -->
+                <div class="grid grid-2 mt-6">
+                    <div class="card">
+                        <h3 class="card-title">How to Use</h3>
+                        <ul class="text-secondary" style="padding-left: 1.5rem; line-height: 1.8;">
+                            <li>Enter numbers to navigate through menus</li>
+                            <li>Use "Send" button or press Enter to submit</li>
+                            <li>Use "Back" to go to previous menu</li>
+                            <li>Use "Home" to return to main menu</li>
+                            <li>Use "Exit" to close the USSD session</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">Available Services</h3>
+                        <ul class="text-secondary" style="padding-left: 1.5rem; line-height: 1.8;">
+                            <li>Pay utility bills instantly</li>
+                            <li>Make instalment payments</li>
+                            <li>Create and manage bill splits</li>
+                            <li>View payment history</li>
+                            <li>Access account settings</li>
+                            <li>Check account balances</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- USSD Code Reference -->
+                <div class="card mt-6">
+                    <h3 class="card-title">USSD Code Reference</h3>
+                    <div class="grid grid-3">
+                        <div>
+                            <h4 class="font-semibold mb-2">Quick Actions</h4>
+                            <ul class="text-secondary text-sm" style="line-height: 1.6;">
+                                <li>*123*1# - Pay Bills</li>
+                                <li>*123*2# - Instalments</li>
+                                <li>*123*3# - Bill Splitting</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Account Info</h4>
+                            <ul class="text-secondary text-sm" style="line-height: 1.6;">
+                                <li>*123*4# - Payment History</li>
+                                <li>*123*5# - Account Settings</li>
+                                <li>*123*0# - Help & Support</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Navigation</h4>
+                            <ul class="text-secondary text-sm" style="line-height: 1.6;">
+                                <li>0 - Go Back</li>
+                                <li>00 - Main Menu</li>
+                                <li>* - Cancel/Exit</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        // USSD Simulator specific functionality
+        let ussdHistory = [];
+        let currentStep = 'main';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeUSSDSimulator();
+        });
+
+        function initializeUSSDSimulator() {
+            setupUSSDControls();
+            renderUSSDScreen();
+        }
+
+        function setupUSSDControls() {
+            const input = document.getElementById('ussd-input');
+            const sendBtn = document.getElementById('ussd-send');
+            const backBtn = document.getElementById('ussd-back');
+            const homeBtn = document.getElementById('ussd-home');
+            const exitBtn = document.getElementById('ussd-exit');
+
+            // Send button and Enter key
+            const handleSend = () => {
+                const value = input.value.trim();
+                if (value) {
+                    processUSSDInput(value);
+                    input.value = '';
+                }
+            };
+
+            sendBtn.addEventListener('click', handleSend);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleSend();
+                }
+            });
+
+            // Navigation buttons
+            backBtn.addEventListener('click', () => {
+                goBack();
+            });
+
+            homeBtn.addEventListener('click', () => {
+                goHome();
+            });
+
+            exitBtn.addEventListener('click', () => {
+                exitUSSD();
+            });
+
+            // Focus input for better UX
+            input.focus();
+        }
+
+        function renderUSSDScreen() {
+            const screen = document.getElementById('ussd-screen');
+            const screens = getUSSDScreens();
+            
+            screen.innerHTML = `<pre>${screens[currentStep] || screens.main}</pre>`;
+        }
+
+        function getUSSDScreens() {
+            const utilities = window.app?.data?.utilities || [];
+            const recentTransactions = window.app?.data?.transactions?.slice(0, 3) || [];
+            
+            return {
+                main: `
+
+Welcome to Smart Billing Assistant
+
+1. Pay Bill
+2. Pay Instalment  
+3. Split Bill
+4. View History
+5. Settings
+0. Exit
+
+Enter choice:`,
+
+                payBill: `Pay Bill
+
+Select utility:
+${utilities.map((u, i) => `${i + 1}. ${u.name} - KES ${u.balance.toLocaleString()}`).join('\n')}
+
+0. Back
+Enter choice:`,
+
+                payInstalment: `Pay Instalment
+
+Choose utility:
+${utilities.map((u, i) => {
+    const progress = Math.round((u.instalmentPaid / u.monthlyAmount) * 100);
+    return `${i + 1}. ${u.name} (${progress}% paid)`;
+}).join('\n')}
+
+0. Back
+Enter choice:`,
+
+                splitBill: `Split Bill
+
+1. Create New Split
+2. View Active Splits
+3. Mark Payment Complete
+
+0. Back
+Enter choice:`,
+
+                history: `Payment History
+
+Recent transactions:
+${recentTransactions.map(t => 
+    `${new Date(t.date).toLocaleDateString()} - ${t.utility} - KES ${t.amount.toLocaleString()}`
+).join('\n')}
+
+1. View More
+2. Export History
+0. Back
+Enter choice:`,
+
+                settings: `Settings
+
+1. Manage Utilities
+2. Reminder Settings  
+3. Account Info
+4. Reset Data
+
+0. Back
+Enter choice:`,
+
+                paymentSuccess: `Payment Successful!
+
+Transaction completed
+Reference: ${generateUSSDReference()}
+Amount: KES 1,500
+Utility: Electricity
+
+1. Pay Another Bill
+2. View Receipt
+0. Main Menu
+Enter choice:`,
+
+                error: `Service Error
+
+The requested service is temporarily unavailable. Please try again later.
+
+1. Retry
+0. Main Menu
+Enter choice:`,
+
+                exit: `Thank you for using Smart Billing Assistant!
+
+Session ended.
+
+Dial *123# to access services again.`
+            };
+        }
+
+        function processUSSDInput(input) {
+            ussdHistory.push(currentStep);
+            
+            switch (currentStep) {
+                case 'main':
+                    handleMainMenu(input);
+                    break;
+                case 'payBill':
+                    handlePayBill(input);
+                    break;
+                case 'payInstalment':
+                    handlePayInstalment(input);
+                    break;
+                case 'splitBill':
+                    handleSplitBill(input);
+                    break;
+                case 'history':
+                    handleHistory(input);
+                    break;
+                case 'settings':
+                    handleSettings(input);
+                    break;
+                default:
+                    handleGenericInput(input);
+            }
+            
+            renderUSSDScreen();
+        }
+
+        function handleMainMenu(input) {
+            switch (input) {
+                case '1':
+                    currentStep = 'payBill';
+                    break;
+                case '2':
+                    currentStep = 'payInstalment';
+                    break;
+                case '3':
+                    currentStep = 'splitBill';
+                    break;
+                case '4':
+                    currentStep = 'history';
+                    break;
+                case '5':
+                    currentStep = 'settings';
+                    break;
+                case '0':
+                    currentStep = 'exit';
+                    break;
+                default:
+                    showUSSDError('Invalid choice. Please try again.');
+            }
+        }
+
+        function handlePayBill(input) {
+            if (input === '0') {
+                currentStep = 'main';
+                return;
+            }
+            
+            const utilities = window.app?.data?.utilities || [];
+            const utilityIndex = parseInt(input) - 1;
+            
+            if (utilityIndex >= 0 && utilityIndex < utilities.length) {
+                currentStep = 'paymentSuccess';
+                // Simulate payment processing
+                setTimeout(() => {
+                    if (window.app) {
+                        const utility = utilities[utilityIndex];
+                        const paymentAmount = Math.min(1500, utility.balance);
+                        
+                        // Update utility balance
+                        utility.balance -= paymentAmount;
+                        utility.instalmentPaid += paymentAmount;
+                        
+                        // Add transaction
+                        const transaction = {
+                            id: Date.now(),
+                            date: new Date().toISOString().split('T')[0],
+                            utility: utility.name,
+                            amount: paymentAmount,
+                            method: 'USSD',
+                            status: 'Completed',
+                            reference: generateUSSDReference()
+                        };
+                        
+                        window.app.data.transactions.unshift(transaction);
+                        window.app.saveData();
+                    }
+                }, 1000);
+            } else {
+                showUSSDError('Invalid utility selection.');
+            }
+        }
+
+        function handlePayInstalment(input) {
+            if (input === '0') {
+                currentStep = 'main';
+                return;
+            }
+            
+            // Similar to handlePayBill but for instalments
+            handlePayBill(input);
+        }
+
+        function handleSplitBill(input) {
+            if (input === '0') {
+                currentStep = 'main';
+                return;
+            }
+            
+            showUSSDMessage('Split bill feature simulated. Returning to main menu...');
+            setTimeout(() => {
+                currentStep = 'main';
+                renderUSSDScreen();
+            }, 2000);
+        }
+
+        function handleHistory(input) {
+            if (input === '0') {
+                currentStep = 'main';
+                return;
+            }
+            
+            showUSSDMessage('History feature simulated. Returning to main menu...');
+            setTimeout(() => {
+                currentStep = 'main';
+                renderUSSDScreen();
+            }, 2000);
+        }
+
+        function handleSettings(input) {
+            if (input === '0') {
+                currentStep = 'main';
+                return;
+            }
+            
+            showUSSDMessage('Settings feature simulated. Returning to main menu...');
+            setTimeout(() => {
+                currentStep = 'main';
+                renderUSSDScreen();
+            }, 2000);
+        }
+
+        function handleGenericInput(input) {
+            if (input === '0') {
+                currentStep = 'main';
+            } else {
+                showUSSDError('Invalid option. Returning to main menu...');
+                setTimeout(() => {
+                    currentStep = 'main';
+                    renderUSSDScreen();
+                }, 2000);
+            }
+        }
+
+        function goBack() {
+            if (ussdHistory.length > 0) {
+                currentStep = ussdHistory.pop();
+                renderUSSDScreen();
+            }
+        }
+
+        function goHome() {
+            currentStep = 'main';
+            ussdHistory = [];
+            renderUSSDScreen();
+        }
+
+        function exitUSSD() {
+            currentStep = 'exit';
+            ussdHistory = [];
+            renderUSSDScreen();
+            
+            // Auto return to main after 3 seconds
+            setTimeout(() => {
+                currentStep = 'main';
+                renderUSSDScreen();
+            }, 3000);
+        }
+
+        function showUSSDError(message) {
+            const screen = document.getElementById('ussd-screen');
+            screen.innerHTML = `<pre>Error
+
+${message}
+
+Press any key to continue...</pre>`;
+        }
+
+        function showUSSDMessage(message) {
+            const screen = document.getElementById('ussd-screen');
+            screen.innerHTML = `<pre>${message}</pre>`;
+        }
+
+        function generateUSSDReference() {
+            const date = new Date().toISOString().slice(2, 10).replace(/-/g, '');
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `USSD${date}${random}`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Utility Billing Assistant - Payment History</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Smart Billing</a>
+                
+                <nav class="nav" role="navigation" aria-label="Main navigation">
+                    <a href="index.html" class="nav-link">Dashboard</a>
+                    <a href="pay.html" class="nav-link">Pay</a>
+                    <a href="split.html" class="nav-link">Split</a>
+                    <a href="history.html" class="nav-link">History</a>
+                    <a href="settings.html" class="nav-link">Settings</a>
+                    <a href="ussd.html" class="nav-link">USSD Simulator</a>
+                </nav>
+                
+                <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <section aria-labelledby="history-title">
+                <h1 id="history-title" class="mb-6">Payment History</h1>
+                
+                <!-- Filters Section -->
+                <div class="card mb-6">
+                    <h2 class="card-title mb-4">Filter Transactions</h2>
+                    
+                    <form id="filter-form" class="grid grid-4">
+                        <div class="form-group">
+                            <label for="filter-utility" class="form-label">Utility</label>
+                            <select id="filter-utility" class="form-select">
+                                <option value="">All Utilities</option>
+                                <option value="Electricity">Electricity</option>
+                                <option value="Water">Water</option>
+                                <option value="Rent">Rent</option>
+                                <option value="Wi-Fi">Wi-Fi</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="filter-status" class="form-label">Status</label>
+                            <select id="filter-status" class="form-select">
+                                <option value="">All Statuses</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Failed">Failed</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="filter-date-from" class="form-label">From Date</label>
+                            <input type="date" id="filter-date-from" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="filter-date-to" class="form-label">To Date</label>
+                            <input type="date" id="filter-date-to" class="form-input">
+                        </div>
+
+                        <div class="form-group flex items-end">
+                            <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        </div>
+
+                        <div class="form-group flex items-end">
+                            <button type="button" id="clear-filters" class="btn btn-secondary">Clear Filters</button>
+                        </div>
+
+                        <div class="form-group flex items-end">
+                            <button type="button" id="export-csv" class="btn btn-success">Export CSV</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Summary Statistics -->
+                <div class="grid grid-4 mb-6">
+                    <div class="card text-center">
+                        <h3 class="card-title">Total Transactions</h3>
+                        <p class="text-2xl font-bold text-primary" id="total-transactions">0</p>
+                    </div>
+                    
+                    <div class="card text-center">
+                        <h3 class="card-title">Total Amount</h3>
+                        <p class="text-2xl font-bold text-success" id="total-amount">KES 0</p>
+                    </div>
+                    
+                    <div class="card text-center">
+                        <h3 class="card-title">This Month</h3>
+                        <p class="text-2xl font-bold text-warning" id="this-month-amount">KES 0</p>
+                    </div>
+                    
+                    <div class="card text-center">
+                        <h3 class="card-title">Average Payment</h3>
+                        <p class="text-2xl font-bold text-secondary" id="average-payment">KES 0</p>
+                    </div>
+                </div>
+
+                <!-- Transaction History Table -->
+                <section aria-labelledby="transactions-title">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 id="transactions-title">Transaction History</h2>
+                        <div class="flex gap-4">
+                            <select id="sort-by" class="form-select" style="width: auto;">
+                                <option value="date-desc">Newest First</option>
+                                <option value="date-asc">Oldest First</option>
+                                <option value="amount-desc">Highest Amount</option>
+                                <option value="amount-asc">Lowest Amount</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="transaction-history">
+                        <!-- Transaction history will be populated by JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Payment Methods Summary -->
+                <section aria-labelledby="methods-title" class="mt-6">
+                    <h2 id="methods-title" class="mb-4">Payment Methods Usage</h2>
+                    <div class="grid grid-4">
+                        <div class="card text-center">
+                            <h3 class="card-title">M-Pesa</h3>
+                            <p class="text-xl font-bold text-primary" id="mpesa-count">0</p>
+                            <p class="text-sm text-secondary" id="mpesa-amount">KES 0</p>
+                        </div>
+                        
+                        <div class="card text-center">
+                            <h3 class="card-title">Airtel Money</h3>
+                            <p class="text-xl font-bold text-primary" id="airtel-count">0</p>
+                            <p class="text-sm text-secondary" id="airtel-amount">KES 0</p>
+                        </div>
+                        
+                        <div class="card text-center">
+                            <h3 class="card-title">T-Kash</h3>
+                            <p class="text-xl font-bold text-primary" id="tkash-count">0</p>
+                            <p class="text-sm text-secondary" id="tkash-amount">KES 0</p>
+                        </div>
+                        
+                        <div class="card text-center">
+                            <h3 class="card-title">Airtime</h3>
+                            <p class="text-xl font-bold text-primary" id="airtime-count">0</p>
+                            <p class="text-sm text-secondary" id="airtime-amount">KES 0</p>
+                        </div>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        // History page specific functionality
+        let filteredTransactions = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeHistoryPage();
+            setupFilters();
+            setupSorting();
+        });
+
+        function initializeHistoryPage() {
+            if (!window.app || !window.app.data) return;
+            
+            filteredTransactions = [...window.app.data.transactions];
+            renderTransactionHistory();
+            updateStatistics();
+            updatePaymentMethodsStats();
+        }
+
+        function setupFilters() {
+            const filterForm = document.getElementById('filter-form');
+            const clearFiltersBtn = document.getElementById('clear-filters');
+
+            filterForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                applyFilters();
+            });
+
+            clearFiltersBtn.addEventListener('click', function() {
+                filterForm.reset();
+                filteredTransactions = [...window.app.data.transactions];
+                renderTransactionHistory();
+                updateStatistics();
+            });
+        }
+
+        function setupSorting() {
+            const sortSelect = document.getElementById('sort-by');
+            sortSelect.addEventListener('change', function() {
+                sortTransactions(this.value);
+                renderTransactionHistory();
+            });
+        }
+
+        function applyFilters() {
+            if (!window.app || !window.app.data) return;
+
+            const utility = document.getElementById('filter-utility').value;
+            const status = document.getElementById('filter-status').value;
+            const dateFrom = document.getElementById('filter-date-from').value;
+            const dateTo = document.getElementById('filter-date-to').value;
+
+            filteredTransactions = window.app.data.transactions.filter(transaction => {
+                if (utility && transaction.utility !== utility) return false;
+                if (status && transaction.status !== status) return false;
+                if (dateFrom && transaction.date < dateFrom) return false;
+                if (dateTo && transaction.date > dateTo) return false;
+                return true;
+            });
+
+            renderTransactionHistory();
+            updateStatistics();
+            window.app.showMessage(`Found ${filteredTransactions.length} transactions matching your filters`, 'success');
+        }
+
+        function sortTransactions(sortBy) {
+            switch (sortBy) {
+                case 'date-desc':
+                    filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    break;
+                case 'date-asc':
+                    filteredTransactions.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    break;
+                case 'amount-desc':
+                    filteredTransactions.sort((a, b) => b.amount - a.amount);
+                    break;
+                case 'amount-asc':
+                    filteredTransactions.sort((a, b) => a.amount - b.amount);
+                    break;
+            }
+        }
+
+        function renderTransactionHistory() {
+            const container = document.getElementById('transaction-history');
+            
+            if (filteredTransactions.length === 0) {
+                container.innerHTML = '<div class="card"><p class="text-center text-secondary">No transactions found matching your criteria</p></div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Utility</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filteredTransactions.map(transaction => `
+                                <tr onclick="toggleTransactionDetails(${transaction.id})" style="cursor: pointer;" 
+                                    aria-expanded="false" aria-controls="details-${transaction.id}">
+                                    <td>${new Date(transaction.date).toLocaleDateString()}</td>
+                                    <td>${transaction.utility}</td>
+                                    <td>KES ${transaction.amount.toLocaleString()}</td>
+                                    <td>${transaction.method}</td>
+                                    <td>
+                                        <span class="badge ${getStatusBadgeClass(transaction.status)}">
+                                            ${transaction.status}
+                                        </span>
+                                    </td>
+                                    <td>${transaction.reference}</td>
+                                </tr>
+                                <tr id="details-${transaction.id}" class="hidden">
+                                    <td colspan="6" class="expandable">
+                                        <div class="grid grid-2">
+                                            <div>
+                                                <h4 class="font-semibold mb-2">Transaction Details</h4>
+                                                <p><strong>Reference:</strong> ${transaction.reference}</p>
+                                                <p><strong>Date & Time:</strong> ${new Date(transaction.date).toLocaleString()}</p>
+                                                <p><strong>Status:</strong> ${transaction.status}</p>
+                                                <p><strong>Method:</strong> ${transaction.method}</p>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-semibold mb-2">Payment Information</h4>
+                                                <p><strong>Utility:</strong> ${transaction.utility}</p>
+                                                <p><strong>Amount:</strong> KES ${transaction.amount.toLocaleString()}</p>
+                                                ${transaction.notes ? `<p><strong>Notes:</strong> ${transaction.notes}</p>` : ''}
+                                                <p><strong>Transaction ID:</strong> ${transaction.id}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function toggleTransactionDetails(transactionId) {
+            const detailsRow = document.getElementById(`details-${transactionId}`);
+            const mainRow = document.querySelector(`tr[onclick="toggleTransactionDetails(${transactionId})"]`);
+            
+            if (detailsRow && mainRow) {
+                const isHidden = detailsRow.classList.contains('hidden');
+                detailsRow.classList.toggle('hidden');
+                mainRow.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+            }
+        }
+
+        function getStatusBadgeClass(status) {
+            switch (status.toLowerCase()) {
+                case 'completed': return 'badge-success';
+                case 'pending': return 'badge-warning';
+                case 'failed': return 'badge-error';
+                default: return 'badge-secondary';
+            }
+        }
+
+        function updateStatistics() {
+            const totalTransactions = filteredTransactions.length;
+            const totalAmount = filteredTransactions.reduce((sum, t) => sum + t.amount, 0);
+            
+            // Calculate this month's transactions
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            const thisMonthAmount = filteredTransactions
+                .filter(t => {
+                    const date = new Date(t.date);
+                    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+                })
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const averagePayment = totalTransactions > 0 ? totalAmount / totalTransactions : 0;
+
+            document.getElementById('total-transactions').textContent = totalTransactions;
+            document.getElementById('total-amount').textContent = `KES ${totalAmount.toLocaleString()}`;
+            document.getElementById('this-month-amount').textContent = `KES ${thisMonthAmount.toLocaleString()}`;
+            document.getElementById('average-payment').textContent = `KES ${Math.round(averagePayment).toLocaleString()}`;
+        }
+
+        function updatePaymentMethodsStats() {
+            if (!window.app || !window.app.data) return;
+
+            const methods = ['M-Pesa', 'Airtel', 'T-Kash', 'Airtime'];
+            
+            methods.forEach(method => {
+                const transactions = filteredTransactions.filter(t => t.method === method || t.method === `${method} Money`);
+                const count = transactions.length;
+                const amount = transactions.reduce((sum, t) => sum + t.amount, 0);
+                
+                const methodKey = method.toLowerCase().replace('-', '');
+                document.getElementById(`${methodKey}-count`).textContent = count;
+                document.getElementById(`${methodKey}-amount`).textContent = `KES ${amount.toLocaleString()}`;
+            });
+        }
+
+        // Make toggleTransactionDetails globally accessible
+        window.toggleTransactionDetails = toggleTransactionDetails;
+    </script>
+</body>
+</html>
